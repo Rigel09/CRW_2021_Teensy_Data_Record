@@ -14,7 +14,10 @@
       "coreStrategy": "copy",
       "stdLib": "newlib",
       "sharedLibraries": [],
-      "projectLibraries": [],
+      "projectLibraries": [
+        "SdFat",
+        "SPI"
+      ],
       "board": {
         "name": "Teensy 4.1",
         "options": {
