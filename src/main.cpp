@@ -12,6 +12,7 @@ Date: Fall 2021
 #include "Arduino.h"
 #include "SPI.h"
 #include "SdFat.h"
+#include "include/ADXL356_Accelerometer.hpp"
 
 //------------------------------------------------------------------------------
 // Store error strings in flash to save RAM.
@@ -33,11 +34,11 @@ const uint8_t SD_CS_PIN = SDCARD_SS_PIN;
 
 // Try to select the best SD card configuration.
 #if HAS_SDIO_CLASS
-#  define SD_CONFIG SdioConfig(FIFO_SDIO)
+#    define SD_CONFIG SdioConfig(FIFO_SDIO)
 #elif ENABLE_DEDICATED_SPI
-#  define SD_CONFIG SdSpiConfig(SD_CS_PIN, DEDICATED_SPI, SPI_CLOCK)
+#    define SD_CONFIG SdSpiConfig(SD_CS_PIN, DEDICATED_SPI, SPI_CLOCK)
 #else // HAS_SDIO_CLASS
-#  define SD_CONFIG SdSpiConfig(SD_CS_PIN, SHARED_SPI, SPI_CLOCK)
+#    define SD_CONFIG SdSpiConfig(SD_CS_PIN, SHARED_SPI, SPI_CLOCK)
 #endif // HAS_SDIO_CLASS
 
 #define testFileName "testFile.csv"
@@ -48,44 +49,44 @@ FsFile testFile;
 
 void setup()
 {
-  pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(9600);
+    pinMode(LED_BUILTIN, OUTPUT);
+    Serial.begin(9600);
 
-  Serial.println("Mounting SD Card");
+    Serial.println("Mounting SD Card");
 
-  // Initialize the SD.
-  if (!sd.begin(SD_CONFIG))
-  {
-    sd.initErrorHalt(&Serial);
-    return;
-  }
+    // Initialize the SD.
+    if (!sd.begin(SD_CONFIG))
+    {
+        sd.initErrorHalt(&Serial);
+        return;
+    }
 
-  Serial.println("SD Card Succesfully mounted");
+    Serial.println("SD Card Succesfully mounted");
 
-  Serial.print("Attempting to open test file ");
-  Serial.println(testFileName);
+    Serial.print("Attempting to open test file ");
+    Serial.println(testFileName);
 
-  // Create the file.
-  if (!testFile.open(testFileName, FILE_WRITE))
-  {
-    error("open failed");
-  }
+    // Create the file.
+    if (!testFile.open(testFileName, FILE_WRITE))
+    {
+        error("open failed");
+    }
 
-  Serial.println("Test file open, writing some data.......");
+    Serial.println("Test file open, writing some data.......");
 
-  // Write test data.
-  testFile.print(F(
-      "abc,123,456,7.89\r\n"
-      "def,-321,654,-9.87\r\n"
-      "ghi,333,0xff,5.55"));
+    // Write test data.
+    testFile.print(F(
+        "abc,123,456,7.89\r\n"
+        "def,-321,654,-9.87\r\n"
+        "ghi,333,0xff,5.55"));
 
-  testFile.close();
+    testFile.close();
 
-  Serial.println("Example data written and file closed.");
+    Serial.println("Example data written and file closed.");
 }
 
 void loop()
 {
-  digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
-  delay(500);
+    digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
+    delay(500);
 }
