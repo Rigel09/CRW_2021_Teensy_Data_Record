@@ -13,6 +13,10 @@ Date: Fall 2021
 #include "SPI.h"
 #include "SdFat.h"
 
+//------------------------------------------------------------------------------
+// Store error strings in flash to save RAM.
+#define error(s) sd.errorHalt(&Serial, F(s))
+
 // Use built-in SD for SPI modes on Teensy 3.5/3.6.
 // Teensy 4.0 use first SPI port.
 // SDCARD_SS_PIN is defined for the built-in SD on some boards.
@@ -46,6 +50,38 @@ void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
+
+  Serial.println("Mounting SD Card");
+
+  // Initialize the SD.
+  if (!sd.begin(SD_CONFIG))
+  {
+    sd.initErrorHalt(&Serial);
+    return;
+  }
+
+  Serial.println("SD Card Succesfully mounted");
+
+  Serial.print("Attempting to open test file ");
+  Serial.println(testFileName);
+
+  // Create the file.
+  if (!testFile.open(testFileName, FILE_WRITE))
+  {
+    error("open failed");
+  }
+
+  Serial.println("Test file open, writing some data.......");
+
+  // Write test data.
+  testFile.print(F(
+      "abc,123,456,7.89\r\n"
+      "def,-321,654,-9.87\r\n"
+      "ghi,333,0xff,5.55"));
+
+  testFile.close();
+
+  Serial.println("Example data written and file closed.");
 }
 
 void loop()
